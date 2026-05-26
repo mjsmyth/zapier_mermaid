@@ -12,9 +12,9 @@ This repo processes Zapier JSON export files and generates Mermaid diagram docum
 python3 create_zapier_mermaid.py <zap_file>
 ```
 
-Example:
+Input JSON files live in the `input/` directory. Example:
 ```bash
-python3 create_zapier_mermaid.py zapfile_maryjane_monday.json
+python3 create_zapier_mermaid.py input/zapfile_maryjane_monday.json
 ```
 
 Output is written to `output/zapier-<title-slug>.md` — one file per active (non-`"off"`) Zap, where the slug is the lowercased, hyphenated Zap title. Warnings and errors are logged to `zapier_mermaid.log`.
@@ -23,6 +23,8 @@ Dependencies: `pystache` (Mustache templating) and `pyyaml` (config file). Insta
 ```bash
 conda install pystache pyyaml
 ```
+
+There are no automated tests or linting tools configured.
 
 ## Zapier JSON structure
 
@@ -74,36 +76,29 @@ JSON file → zap_dict["zaps"]
             ├─ assigns sequential IDs: N1, N2, N3, ...
             ├─ collapses BranchingAPI/filter nodes onto edges (not rendered as nodes)
             └─ sorts branch path edges: "success/yes" first, "error/no" last
-       └─ pystache.render(TEMPLATE, context) → writes output/<stem>_output_NN.md
+       └─ pystache.render(TEMPLATE, context) → writes output/zapier-<slug>.md
 ```
 
 The `parent_id` chain defines graph edges. `step_inputs` on a child becomes the label on the edge from its parent.
 
 ### Config-driven node dispatch (`zapier_node_config.yaml`)
 
-All known `(api_name, action)` pairs are registered in `zapier_node_config.yaml`. The script loads this into three dicts:
+All known `(api_name, action)` pairs are registered in `zapier_node_config.yaml`. The script loads this into three module-level dicts:
 
 - `NODE_CONFIG` — keyed on `(api_name, action)`; each entry has `display_name`, `node_type`, `params` (field extractions), `constants`, and optionally `special`
 - `NODE_CONFIG_META` — keyed on `api_name`; holds `provider` and `emoji` for label building
 - `PROVIDER_COLORS` — keyed on provider name; holds the Mermaid `style` string
 
-`_normalize_api()` strips the version suffix from `selected_api` before lookup. Unrecognised `(api, action)` pairs log a warning but don't abort.
+`_normalize_api()` strips the `@version` suffix from `selected_api` before lookup (e.g. `GoogleDriveCLIAPI@1.18.2` → `GoogleDriveCLIAPI`). Unrecognised `(api, action)` pairs log a warning but don't abort.
 
-**To add a new Zapier integration:** add an entry to `zapier_node_config.yaml` under the api name. No Python changes are needed unless the handler logic must be conditional (e.g., checking action type or iterating a sub-dict). In that case, add a function to `_SPECIAL_HANDLERS` in `create_zapier_mermaid.py` and reference it via `special: _your_handler_name` in the YAML.
+**To add a new Zapier integration:** add an entry to `zapier_node_config.yaml` under the api name. No Python changes are needed unless the handler logic must be conditional (e.g., checking action type or iterating a sub-dict). In that case, add a function to `_SPECIAL_HANDLERS` in `create_zapier_mermaid.py` and reference it via `special: _your_handler_name` in the YAML. `_SPECIAL_HANDLERS` is a dict mapping handler name strings to functions, populated at module level after the handler functions are defined.
+
+### Branch node collapsing
+
+`BranchingAPI` filter nodes are not rendered as graph nodes — they are collapsed onto edges by `build_render_context()`. When a node's parent is a branch filter, the edge is drawn from the filter's parent instead, with the branch path label (e.g. "success", "error") as the edge label. Branch path edges are sorted: "success/yes" variants first, "error/no" variants last.
 
 ### Output format (`zapier_mermaid.mustache`)
 
 Each output file is Markdown with YAML frontmatter (title, deprecated, hidden, robots), a summary table, and a fenced `mermaid graph TD` block. Regular nodes use `[" "]` syntax; branch/path nodes use `{" "}` (diamond shape). Edges use `-->|label|` with `step_inputs` as the label. Each node gets a `style` directive with provider-specific fill color from `PROVIDER_COLORS`.
 
-## Files
-
-| File | Description |
-|------|-------------|
-| `zapfiles_maryjane.json` | Mary Jane's personal Zaps (raw export) |
-| `zapfiles_maryjane_pretty.json` | Same as above, pretty-printed |
-| `zapfile_maryjane_monday.json` | Subset: only the Monday-related Zap |
-| `zapfile_maryjane_monday_pretty.json` | Same as above, pretty-printed |
-| `zapfile_company.json` | Full company Zap export (29 Zaps) |
-| `zapier_node_config.yaml` | Registry of all known Zapier API/action pairs and provider styles |
-| `zapier_mermaid.mustache` | Mustache template that produces the Mermaid Markdown output |
-| `zapier_mermaid.md` | Hand-crafted reference example of the target output format |
+The template uses `{{{triple braces}}}` for unescaped output (required for Mermaid syntax and `<br/>` tags) and `{{double braces}}` for HTML-escaped content. Use triple braces for any field that may contain Mermaid characters or HTML.
