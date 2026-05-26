@@ -264,6 +264,9 @@ def main():
     args = parser.parse_args()
     zap_folder = pathlib.Path(args.zap_folder)
     zap_path = zap_folder / f"{zap_folder.name}.json"
+    zap_alt_path = zap_folder / "zapfile.json"
+    if zap_alt_path.exists():
+        zap_path = zap_alt_path
     if not zap_path.exists():
         parser.error(f"Expected JSON file not found: {zap_path}")
     output_dir = pathlib.Path(__file__).parent / "output" / zap_folder.name
