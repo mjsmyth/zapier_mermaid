@@ -227,12 +227,15 @@ def process_node(zap, node, zap_doc):
     if "path_eval_index" in raw_params:
         zap_doc["nodes"][node]["path_eval_index"] = raw_params["path_eval_index"]
 
-    if "my_dict" in zap["nodes"][node]["params"]:
-        zap_doc["nodes"][node]["params"] = "Params: " + ", ".join(zap["nodes"][node]["params"]["my_dict"].keys())
-        params_values = " ".join(zap["nodes"][node]["params"]["my_dict"].values())
-        if "gives" in params_values:
-            zap_doc["nodes"][node]["step_inputs"] = "shouldn't be blank"
-            zap_doc["nodes"][node]["step_inputs"] = str(re.findall(r'gives\[\"[0-9]{9,9}\"]\[\"([a-zA-Z]+?)\"]', params_values))
+    if "my_dict" in raw_params:
+        zap_doc["nodes"][node]["params"] = "Params: " + ", ".join(raw_params["my_dict"].keys())
+
+    # Extract step_inputs from all params values, not just my_dict
+    params_str = str(raw_params)
+    if "gives" in params_str:
+        found = re.findall(r'gives\[\"[0-9]{9,9}\"]\[\"([a-zA-Z_]+?)\"]', params_str)
+        if found:
+            zap_doc["nodes"][node]["step_inputs"] = str(found)
 
     api_name = _normalize_api(zap["nodes"][node]["selected_api"])
     action = zap["nodes"][node]["action"]

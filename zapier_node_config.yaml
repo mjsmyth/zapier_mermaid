@@ -188,6 +188,10 @@ NotionCLIAPI:
       - source_key: datasource
         target_key: node_datasource
 
+  add_block_to_page:
+    display_name: "Notion – Add Block To Page"
+    node_type: action
+    params: []
 Sendinbluev2CLIAPI:
   _meta:
     provider: Brevo

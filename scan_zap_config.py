@@ -244,15 +244,48 @@ def apply_gaps(gaps: list[dict], config: dict) -> None:
             config[api_name][action] = stub
 
 
-def write_config(header: str, config: dict) -> None:
-    """Serialise *config* back to the YAML file, re-attaching the header comment."""
-    dumped = yaml.dump(
-        config,
-        default_flow_style=False,
-        allow_unicode=True,
-        sort_keys=False,
-    )
-    _CONFIG_PATH.write_text(header + "\n" + dumped)
+def write_config(gaps: list[dict], config: dict) -> None:
+    """Insert stub entries directly into the YAML file text, preserving all existing formatting."""
+    text = _CONFIG_PATH.read_text()
+    known_apis = {api for api, _ in _known_pairs(config)}
+
+    by_api: dict[str, list[dict]] = {}
+    for gap in gaps:
+        by_api.setdefault(gap["api"], []).append(gap)
+
+    for api_name, api_gaps in sorted(by_api.items()):
+        stub_lines = []
+        for gap in sorted(api_gaps, key=lambda x: x["action"]):
+            stub_lines.extend(_stub_yaml_lines(gap, config))
+        stub_text = "\n".join(stub_lines) + "\n"
+
+        if api_name in known_apis:
+            # Find the end of the existing API block and insert the stub before the next top-level key
+            lines = text.splitlines(keepends=True)
+            insert_at = len(lines)
+            in_block = False
+            for i, line in enumerate(lines):
+                if line.rstrip("\n") == f"{api_name}:":
+                    in_block = True
+                    continue
+                if in_block and line.strip() and not line[0].isspace() and not line.startswith("#"):
+                    insert_at = i
+                    break
+            lines.insert(insert_at, stub_text)
+            text = "".join(lines)
+        else:
+            # New provider — append a full block to the end of the file
+            provider = _infer_provider(api_name)
+            block = (
+                f"\n{api_name}:\n"
+                f"  _meta:\n"
+                f'    provider: "{provider}"  # TODO: verify\n'
+                f'    emoji: "⚙️"  # TODO: update\n'
+            )
+            block += "\n".join(stub_lines) + "\n"
+            text += block
+
+    _CONFIG_PATH.write_text(text)
 
 
 # ---------------------------------------------------------------------------
@@ -287,8 +320,7 @@ def main() -> None:
             return
         backup_path = backup_config()
         print(f"\nBackup saved → {backup_path.name}")
-        apply_gaps(gaps, config)
-        write_config(header, config)
+        write_config(gaps, config)
         print(f"Updated  → {_CONFIG_PATH.name}")
 
 
