@@ -266,8 +266,8 @@ def main():
     zap_path = zap_folder / f"{zap_folder.name}.json"
     if not zap_path.exists():
         parser.error(f"Expected JSON file not found: {zap_path}")
-    output_dir = pathlib.Path(__file__).parent / "output"
-    output_dir.mkdir(exist_ok=True)
+    output_dir = pathlib.Path(__file__).parent / "output" / zap_folder.name
+    output_dir.mkdir(parents=True, exist_ok=True)
     with open(zap_path) as f:
         zap_dict = json.load(f)
     zap_doc = {}
