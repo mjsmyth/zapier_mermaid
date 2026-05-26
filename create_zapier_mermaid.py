@@ -260,11 +260,17 @@ def process_zap(zap, zap_doc, output_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Generate Mermaid diagrams from a Zapier JSON export.")
-    parser.add_argument("zap_file", help="Path to the Zapier JSON export file")
+    parser.add_argument("zap_folder", help="Path to the folder containing the Zapier JSON export (JSON filename must match folder name)")
     args = parser.parse_args()
-    zap_path = pathlib.Path(args.zap_file)
-    output_dir = zap_path.parent / "output"
-    output_dir.mkdir(exist_ok=True)
+    zap_folder = pathlib.Path(args.zap_folder)
+    zap_path = zap_folder / f"{zap_folder.name}.json"
+    zap_alt_path = zap_folder / "zapfile.json"
+    if zap_alt_path.exists():
+        zap_path = zap_alt_path
+    if not zap_path.exists():
+        parser.error(f"Expected JSON file not found: {zap_path}")
+    output_dir = pathlib.Path(__file__).parent / "output" / zap_folder.name
+    output_dir.mkdir(parents=True, exist_ok=True)
     with open(zap_path) as f:
         zap_dict = json.load(f)
     zap_doc = {}
