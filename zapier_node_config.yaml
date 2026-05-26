@@ -1,0 +1,310 @@
+# zapier_node_config.yaml
+#
+# Registry of all known Zapier (api, action) pairs.
+# Each entry defines:
+#   display_name:  Human-readable name for the step
+#   node_type:     trigger | action | filter | search | subzap
+#   params:        list of param extractions { source_key, target_key, truncate (optional) }
+#   constants:     (optional) fixed key/value pairs always written to node_doc
+#   special:       (optional) name of Python handler for conditional logic
+#
+# Each API also has a _meta section with:
+#   provider:    name of the provider (must match a key in the providers section below)
+#   emoji:       displayed in the diagram node label
+#
+# To change a provider's colour, update it once in the providers section below.
+# To add a new integration: add an entry under the api_name with the action name,
+# fill in display_name, node_type, and any params to extract. No Python changes needed
+# unless the logic is conditional (like webhooks or filters).
+
+providers:
+  Attio:
+    style: "fill:#EEECEA,stroke:#5F5E5A,stroke-width:0.5px,color:#2C2C2A"
+  Brevo:
+    style: "fill:#D0EEF8,stroke:#0B6080,stroke-width:0.5px,color:#03293A"
+  GitHub:
+    style: "fill:#D6F0E8,stroke:#0F6E56,stroke-width:0.5px,color:#04342C"
+  "Google Drive":
+    style: "yellow fill:#FEFBD0,stroke:#9A7E00,stroke-width:0.5px,color:#3D3000"
+  "Google Sheets":
+    style: "pink fill:#FBEAF0,stroke:#993556,stroke-width:0.5px,color:#4B1528"
+  LaunchBay:
+    style: "fill:#D6E8F9,stroke:#185FA5,stroke-width:0.5px,color:#042C53"
+  Notion:
+    style: "fill:#E2E0FB,stroke:#534AB7,stroke-width:0.5px,color:#26215C"
+  Slack:
+    style: "fill:#F2DCE8,stroke:#8C2258,stroke-width:0.5px,color:#3D0825"
+  Zapier:
+    style: "fill:#FCE8C4,stroke:#BA7517,stroke-width:0.5px,color:#4124027"
+
+AttioCLIAPI:
+  _meta:
+    provider: Attio
+    emoji: "📊"
+  assert_list_entry:
+    display_name: "Attio – Assert List Entry"
+    node_type: action
+    params: []
+  assert_record:
+    display_name: "Attio – Assert Record"
+    node_type: action
+    params: []
+  create_list_entry:
+    display_name: "Attio – Create List Entry"
+    node_type: action
+    params: []
+  find_list_entry:
+    display_name: "Attio – Find List Entry"
+    node_type: search
+    params: []
+  find_record:
+    display_name: "Attio – Find Record"
+    node_type: search
+    params: []
+  list_entry_created:
+    display_name: "Attio – List Entry Created"
+    node_type: trigger
+    params: []
+  list_entry_updated:
+    display_name: "Attio – List Entry Updated"
+    node_type: trigger
+    params: []
+  record_updated:
+    display_name: "Attio – Record Updated"
+    node_type: trigger
+    params: []
+  update_list_entry:
+    display_name: "Attio – Update List Entry"
+    node_type: action
+    params: []
+  update_record_attributes:
+    display_name: "Attio – Update Record Attributes"
+    node_type: action
+    params: []
+
+BranchingAPI:
+  _meta:
+    provider: Zapier
+    emoji: "🔀"
+  branch:
+    display_name: "Zapier – Branch / Paths"
+    node_type: action
+    params: []
+    constants:
+      node_branch: true
+  filter:
+    display_name: "Zapier – Filter (in Branch)"
+    node_type: filter
+    special: _handle_filter
+    params: []
+
+FilesByZapierCLIAPI:
+  _meta:
+    provider: Zapier
+    emoji: "📄"
+  file_from_text:
+    display_name: "Files by Zapier – Create File from Text"
+    node_type: action
+    params: []
+
+FilterAPI:
+  _meta:
+    provider: Zapier
+    emoji: "🔽"
+  filter:
+    display_name: "Zapier – Filter by Zapier"
+    node_type: filter
+    special: _handle_filter
+    params: []
+
+GitHubCLIAPI:
+  _meta:
+    provider: GitHub
+    emoji: "🐙"
+  create_file:
+    display_name: "GitHub – Create File"
+    node_type: action
+    params: []
+
+GoogleDriveCLIAPI:
+  _meta:
+    provider: "Google Drive"
+    emoji: "🔍"
+  file_in_folder_v2:
+    display_name: "Google Drive – New File in Folder"
+    node_type: trigger
+    params:
+      - source_key: folder
+        target_key: node_folder
+      - source_key: includeSubfolders
+        target_key: node_include_subfolders
+
+GoogleSheetsV2CLIAPI:
+  _meta:
+    provider: "Google Sheets"
+    emoji: "📊"
+  add_row:
+    display_name: "Google Sheets – Add Row"
+    node_type: action
+    params: []
+  lookup_row:
+    display_name: "Google Sheets – Lookup Row"
+    node_type: search
+    params: []
+
+MotionIoCLIAPI:
+  _meta:
+    provider: LaunchBay
+    emoji: "⚡"
+  create_project:
+    display_name: "LaunchBay – Create Project"
+    node_type: action
+    params: []
+  find_project:
+    display_name: "LaunchBay – Find Project"
+    node_type: search
+    params: []
+  form_submitted:
+    display_name: "LaunchBay – Form Submitted"
+    node_type: trigger
+    params: []
+  tag_added:
+    display_name: "LaunchBay – Tag Added"
+    node_type: trigger
+    params: []
+  task_status_change:
+    display_name: "LaunchBay – Task Status Changed"
+    node_type: trigger
+    params: []
+
+NotionCLIAPI:
+  _meta:
+    provider: Notion
+    emoji: "📌"
+  create_database_item:
+    display_name: "Notion – Create Database Item"
+    node_type: action
+    params:
+      - source_key: datasource
+        target_key: node_datasource
+
+Sendinbluev2CLIAPI:
+  _meta:
+    provider: Brevo
+    emoji: "📧"
+  CompanyAddOrUpdate:
+    display_name: "Brevo – Add or Update Company"
+    node_type: action
+    params: []
+  addorupdateContact:
+    display_name: "Brevo – Add or Update Contact"
+    node_type: action
+    params: []
+  contactAddorupdate:
+    display_name: "Brevo – Contact Add or Update"
+    node_type: action
+    params: []
+  contactFind:
+    display_name: "Brevo – Find Contact"
+    node_type: search
+    params: []
+
+SlackCLIAPI:
+  _meta:
+    provider: Slack
+    emoji: "💬"
+  channel_message:
+    display_name: "Slack – Send Channel Message"
+    node_type: action
+    params:
+      - source_key: channel
+        target_key: node_channel
+      - source_key: message
+        target_key: node_message_preview
+        truncate: 80
+
+SubZapCLIAPI:
+  _meta:
+    provider: Zapier
+    emoji: "🔄"
+  call_subzap:
+    display_name: "Zapier – Call Sub-Zap"
+    node_type: subzap
+    params: []
+  return_subzap:
+    display_name: "Zapier – Return from Sub-Zap"
+    node_type: subzap
+    params: []
+  start_subzap:
+    display_name: "Zapier – Sub-Zap Start"
+    node_type: trigger
+    params: []
+
+TableCLIAPI:
+  _meta:
+    provider: Zapier
+    emoji: "🗃️"
+  create_record:
+    display_name: "Zapier Tables – Create Record"
+    node_type: action
+    params: []
+  find_record:
+    display_name: "Zapier Tables – Find Record"
+    node_type: search
+    params: []
+
+WebHookCLIAPI:
+  _meta:
+    provider: Zapier
+    emoji: "🔗"
+  get:
+    display_name: "Webhooks by Zapier – GET Request"
+    node_type: action
+    special: _handle_webhook
+    params: []
+  inbound_v2:
+    display_name: "Webhooks by Zapier – Catch Hook"
+    node_type: trigger
+    special: _handle_webhook
+    params: []
+
+ZapierFormatterCLIAPI:
+  _meta:
+    provider: Zapier
+    emoji: "🔧"
+  datetime_line_item:
+    display_name: "Zapier Formatter – Date/Time"
+    node_type: action
+    params: []
+  text_line_item:
+    display_name: "Zapier Formatter – Text"
+    node_type: action
+    params: []
+  util_line_item:
+    display_name: "Zapier Formatter – Line Itemizer"
+    node_type: action
+    params:
+      - source_key: transform
+        target_key: node_transform
+
+ZapierLoopingCLIAPI:
+  _meta:
+    provider: Zapier
+    emoji: "🔁"
+  loop_values_line_items:
+    display_name: "Zapier Looping – Loop Line Items"
+    node_type: action
+    params: []
+  loop_values_numbers:
+    display_name: "Zapier Looping – Loop Numbers"
+    node_type: action
+    params: []
+
+ZapierMailCLIAPI:
+  _meta:
+    provider: Zapier
+    emoji: "📧"
+  inbound_v2:
+    display_name: "Email by Zapier – Inbound"
+    node_type: trigger
+    params: []

@@ -1,0 +1,136 @@
+{
+  "metadata": {
+    "version": "gdpr_v1"
+  },
+  "zaps": [
+    {
+      "id": 360080054,
+      "title": "Organize and archive new Google Drive files in Notion database, extract and categorize information",
+      "status": "on",
+      "nodes": {
+        "360080054": {
+          "id": 360080054,
+          "account_id": 27144637,
+          "customuser_id": 27278755,
+          "paused": false,
+          "type_of": "read",
+          "params": {
+            "includeDeleted": "false",
+            "drive": "",
+            "folder": "1UwdfdiG6WfXi2dKNABT_bn8Jh1QhCat2",
+            "includeSubfolders": true
+          },
+          "meta": {
+            "$editor": {
+              "has_automatic_issues": false
+            },
+            "parammap": {
+              "drive": "My Google Drive",
+              "folder": "goats_backup"
+            }
+          },
+          "triple_stores": {
+            "copied_from": null,
+            "created_by": null,
+            "polling_interval_override": 0,
+            "block_and_release_limit_override": 0,
+            "spread_tasks": 1
+          },
+          "folders": null,
+          "parent_id": null,
+          "root_id": null,
+          "action": "file_in_folder_v2",
+          "selected_api": "GoogleDriveCLIAPI@1.18.2",
+          "title": "Organize and archive new Google Drive files in Notion database, extract and categorize information",
+          "authentication_id": 63406548,
+          "created_at": "2026-04-18T19:34:47+00:00",
+          "last_changed": "2026-04-18T20:19:39+00:00"
+        },
+        "360080056": {
+          "id": 360080056,
+          "account_id": 27144637,
+          "customuser_id": 27278755,
+          "paused": true,
+          "type_of": "write",
+          "params": {
+            "transform": "util.line_itemizer",
+            "subtotal_toggle": false,
+            "decimals": "2",
+            "inputs": "Drawing",
+            "my_dict": {
+              "Doc name": "{{=gives[\"360080054\"][\"title\"]}}",
+              "Category": "Drawings",
+              "URL": "{{=gives[\"360080054\"][\"webContentLink\"]}}"
+            }
+          },
+          "meta": {
+            "$editor": {
+              "has_automatic_issues": false
+            },
+            "parammap": {
+              "transform": "Line Itemizer (Create/Append/Prepend)"
+            }
+          },
+          "triple_stores": {
+            "copied_from": null,
+            "created_by": null,
+            "polling_interval_override": 0,
+            "block_and_release_limit_override": 0,
+            "spread_tasks": 1
+          },
+          "folders": null,
+          "parent_id": 360080054,
+          "root_id": 360080054,
+          "action": "util_line_item",
+          "selected_api": "ZapierFormatterCLIAPI@1.0.8",
+          "title": null,
+          "authentication_id": null,
+          "created_at": "2026-04-18T19:34:47+00:00",
+          "last_changed": "2026-04-18T20:17:26+00:00"
+        },
+        "360080057": {
+          "id": 360080057,
+          "account_id": 27144637,
+          "customuser_id": 27278755,
+          "paused": true,
+          "type_of": "write",
+          "params": {
+            "datasource": "346c7255-43b7-80f6-973f-000bd9e88651",
+            "properties|||Doc name|||title": "{{=gives[\"360080056\"][\"output\"][\"Drawing[]Doc name\"]}}",
+            "properties|||Category|||multi_select": [
+              "Drawings"
+            ],
+            "properties|||URL|||url": "{{=gives[\"360080056\"][\"output\"][\"Drawing[]URL\"]}}",
+            "content": "Drawing from the illustration class at Massana with name {{=gives[\"360080056\"][\"output\"][\"Drawing[]Doc name\"]}} and link {{=gives[\"360080056\"][\"output\"][\"Drawing[]URL\"]}}",
+            "content_format": "plain_text"
+          },
+          "meta": {
+            "$editor": {
+              "has_automatic_issues": false
+            },
+            "parammap": {
+              "datasource": "Document Hub"
+            },
+            "stepTitle": "Create Data Source Item"
+          },
+          "triple_stores": {
+            "copied_from": null,
+            "created_by": null,
+            "polling_interval_override": 0,
+            "block_and_release_limit_override": 0,
+            "spread_tasks": 1
+          },
+          "folders": null,
+          "parent_id": 360080056,
+          "root_id": 360080054,
+          "action": "create_database_item",
+          "selected_api": "NotionCLIAPI@2.32.0",
+          "title": null,
+          "authentication_id": 63406621,
+          "created_at": "2026-04-18T19:34:47+00:00",
+          "last_changed": "2026-04-18T20:17:26+00:00"
+        }
+      }
+    }
+  ]
+}
