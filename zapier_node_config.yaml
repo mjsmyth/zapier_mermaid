@@ -25,9 +25,9 @@ providers:
   GitHub:
     style: "fill:#D6F0E8,stroke:#0F6E56,stroke-width:0.5px,color:#04342C"
   "Google Drive":
-    style: "yellow fill:#FEFBD0,stroke:#9A7E00,stroke-width:0.5px,color:#3D3000"
+    style: "fill:#FEFBD0,stroke:#9A7E00,stroke-width:0.5px,color:#3D3000"
   "Google Sheets":
-    style: "pink fill:#FBEAF0,stroke:#993556,stroke-width:0.5px,color:#4B1528"
+    style: "fill:#FBEAF0,stroke:#993556,stroke-width:0.5px,color:#4B1528"
   LaunchBay:
     style: "fill:#D6E8F9,stroke:#185FA5,stroke-width:0.5px,color:#042C53"
   Notion:
